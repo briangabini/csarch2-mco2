@@ -63,25 +63,34 @@ class Binary128Converter:
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
         
         binary_mantissa, base_2_exponent = self.normalize_binary_floating_point(binary_mantissa, base_2_exponent)   # Normalize the binary mantissa
-        
-        self.exponent_bits = format(16383 + base_2_exponent, '015b')                                                # Calculate the exponent bits               
-        self.mantissa_bits = binary_mantissa.split('.')[1].ljust(112, '0')[:112]                                    # Calculate the mantissa bits      
+        print(binary_mantissa, base_2_exponent)
+        # If the base-2 exponent is less than -16382, then special case denormalized
+        if base_2_exponent < -16382:                                                                                # If the base-2 exponent is less than -16382, the number is denormalized
+            self.exponent_bits = '0' * 15                                                                           # The exponent bits are all zeros for denormalized numbers
+            shift = min(112, -base_2_exponent - 16382) 
+            shift = abs(shift)
+            self.mantissa_bits = binary_mantissa.replace('.', '')
+            self.mantissa_bits = '0' * shift + self.mantissa_bits
+            self.mantissa_bits = self.mantissa_bits.ljust(112, '0')
+        else:
+            self.exponent_bits = format(16383 + base_2_exponent, '015b')                                                # Calculate the exponent bits               
+            self.mantissa_bits = binary_mantissa.split('.')[1].ljust(112, '0')[:112]                                  # Calculate the mantissa bits      
 
     def get_binary128(self):
         return self.sign_bit + ' ' + self.exponent_bits + ' ' + self.mantissa_bits                                  # Return the binary128 representation
 
     def get_hexadecimal(self):
-        binary128 = self.get_binary128().replace(' ', '')                                                           # Remove the spaces
+        binary128 = self.get_binary128().replace(' ', '')                                                  # Remove the spaces
         hex_value = hex(int(binary128, 2)).upper()                                                                  # Convert binary to hexadecimal
         
         return hex_value
     
 # Test with binary mantissa
-""" binary_mantissa = input("Enter the binary mantissa: ")
-base_2_exponent = int(input("Enter the base-2 exponent: "))
+#binary_mantissa = input("Enter the binary mantissa: ")
+#base_2_exponent = int(input("Enter the base-2 exponent: "))
 
 converter = Binary128Converter()
-# converter.convert_binary_mantissa_to_binary128('101.01', 25)
-converter.convert_binary_mantissa_to_binary128(binary_mantissa, base_2_exponent)
+converter.convert_binary_mantissa_to_binary128('101.011', 16387)
+#converter.convert_binary_mantissa_to_binary128(binary_mantissa, base_2_exponent)
 print(converter.get_binary128())
-print(converter.get_hexadecimal())  """
+print(converter.get_hexadecimal())
