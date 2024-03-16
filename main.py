@@ -11,6 +11,14 @@ Output/s:
 (3) with option to output in text file.
 """
 
+import customtkinter
+
+customtkinter.set_appearance_mode("system")
+customtkinter.set_default_color_theme("dark-blue")
+
+root = customtkinter.CTk()
+root.geometry("1400x450")
+
 class Binary128Converter:
     def __init__(self):
         self.sign_bit = '0'                                                                                         # 1 bit | 0 if positive, 1 if negative
@@ -55,7 +63,8 @@ class Binary128Converter:
         new_point_position = normalized_mantissa_with_leading_zeroes.index('.')                                     # Find the position of the binary point after normalization      
         shift = original_point_position - new_point_position                                                        # Calculate the shift                    
 
-        base_2_exponent += shift                                                                                    # add the shift to the exponent (shift can be negative or positive)
+        # base_2_exponent += shift                                                                                    # add the shift to the exponent (shift can be negative or positive)
+        base_2_exponent = int(base_2_exponent) + shift
         
         return normalized_mantissa, base_2_exponent
 
@@ -82,7 +91,7 @@ class Binary128Converter:
 
     def get_binary128(self):
         return self.sign_bit + ' ' + self.exponent_bits + ' ' + self.mantissa_bits                                  # Return the binary128 representation
-
+        
     def get_hexadecimal(self):
         binary128 = self.get_binary128().replace(' ', '')                                                  # Remove the spaces
         hex_value = hex(int(binary128, 2)).upper()                                                                  # Convert binary to hexadecimal
@@ -90,11 +99,63 @@ class Binary128Converter:
         return hex_value
     
 # Test with binary mantissa
-#binary_mantissa = input("Enter the binary mantissa: ")
-#base_2_exponent = int(input("Enter the base-2 exponent: "))
+# binary_mantissa = input("Enter the binary mantissa: ")
+# base_2_exponent = int(input("Enter the base-2 exponent: "))
 
 converter = Binary128Converter()
-converter.convert_binary_mantissa_to_binary128('101.011', 16387)
-#converter.convert_binary_mantissa_to_binary128(binary_mantissa, base_2_exponent)
-print(converter.get_binary128())
-print(converter.get_hexadecimal())
+    
+frame = customtkinter.CTkFrame(master=root)
+frame.pack(pady=10, padx=10, fill="both", expand=True)
+
+def calculate():
+    # put input into calculations
+    converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
+    
+    # print final result/s
+    result0.configure(text=f'----- RESULT -----')
+    result1.configure(text=f'Binary format: {converter.get_binary128()}')
+    result2.configure(text=f'Hexadecimal format: {converter.get_hexadecimal()}')
+
+def clear():
+    entry1.delete(0, "end")
+    entry2.delete(0, "end")
+
+label = customtkinter.CTkLabel(master=frame, text="Binary-128 Floating Point Converter", font=("Arial", 20))
+label.pack(pady=10, padx=10)
+
+entry1 = customtkinter.CTkEntry(master=frame, 
+                                placeholder_text="Binary mantissa", 
+                                font=("Arial", 14),
+                                height=40,
+                                width=200,
+                                corner_radius = 40
+                                )
+entry1.pack(pady=10, padx=10)
+
+entry2 = customtkinter.CTkEntry(master=frame, 
+                                placeholder_text="Base-2 exponent", 
+                                font=("Arial", 14),
+                                height=40,
+                                width=200,
+                                corner_radius = 40
+                                )
+entry2.pack(pady=10, padx=10)
+
+button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
+button.pack(pady=10, padx=10)
+
+button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14))
+button.pack(pady=10, padx=10)
+
+result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
+result0.pack(pady=10, padx=10)
+
+result1 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
+# result1._text_label.configure(wraplength=50)
+result1.pack(pady=10, padx=10)
+
+result2 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
+# result2._text_label.configure(wraplength=50)
+result2.pack(pady=10, padx=10)
+
+root.mainloop()
