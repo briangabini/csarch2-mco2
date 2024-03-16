@@ -151,11 +151,9 @@ result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
 result0.pack(pady=10, padx=10)
 
 result1 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-# result1._text_label.configure(wraplength=50)
 result1.pack(pady=10, padx=10)
 
 result2 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-# result2._text_label.configure(wraplength=50)
 result2.pack(pady=10, padx=10)
 
 root.mainloop()
