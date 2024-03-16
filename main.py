@@ -72,6 +72,10 @@ class Binary128Converter:
             self.mantissa_bits = binary_mantissa.replace('.', '')
             self.mantissa_bits = '0' * shift + self.mantissa_bits
             self.mantissa_bits = self.mantissa_bits.ljust(112, '0')
+                # If the base-2 exponent is greater than 16383, then special case infinity
+        elif base_2_exponent > 16383:
+            self.exponent_bits = '1' * 15                                                                           # The exponent bits are all ones for infinity
+            self.mantissa_bits = '0' * 112                                                                           # The mantissa bits are all zeros for infinity
         else:
             self.exponent_bits = format(16383 + base_2_exponent, '015b')                                                # Calculate the exponent bits               
             self.mantissa_bits = binary_mantissa.split('.')[1].ljust(112, '0')[:112]                                  # Calculate the mantissa bits      
