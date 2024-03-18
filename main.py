@@ -109,7 +109,10 @@ frame.pack(pady=10, padx=10, fill="both", expand=True)
 
 def calculate():
     # put input into calculations
-    converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
+    if entry1.get() and entry2.get():  # If the binary mantissa and base-2 exponent fields are not empty
+        converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
+    elif entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
+        converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
     # print final result/s
     result0.configure(text=f'----- RESULT -----')
@@ -140,6 +143,24 @@ entry2 = customtkinter.CTkEntry(master=frame,
                                 corner_radius = 40
                                 )
 entry2.pack(pady=10, padx=10)
+
+entry3 = customtkinter.CTkEntry(master=frame, 
+                                placeholder_text="Decimal number", 
+                                font=("Arial", 14),
+                                height=40,
+                                width=200,
+                                corner_radius = 40
+                                )
+entry3.pack(pady=10, padx=10)
+
+entry4 = customtkinter.CTkEntry(master=frame, 
+                                placeholder_text="Base-10 exponent", 
+                                font=("Arial", 14),
+                                height=40,
+                                width=200,
+                                corner_radius = 40
+                                )
+entry4.pack(pady=10, padx=10)
 
 button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
 button.pack(pady=10, padx=10)
