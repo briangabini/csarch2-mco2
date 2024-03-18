@@ -11,6 +11,9 @@ Output/s:
 (3) with option to output in text file.
 """
 
+import tkinter as tk
+from tkinter import ttk
+
 import customtkinter
 
 customtkinter.set_appearance_mode("system")
@@ -107,11 +110,23 @@ converter = Binary128Converter()
 frame = customtkinter.CTkFrame(master=root)
 frame.pack(pady=10, padx=10, fill="both", expand=True)
 
+
+label = customtkinter.CTkLabel(master=frame, text="Binary-128 Floating Point Converter", font=("Arial", 20))
+label.pack(pady=10, padx=10)
+
+# dropdown menu for input type
+input_type = tk.StringVar()
+combobox = ttk.Combobox(master=frame, textvariable=input_type, values=["Binary", "Decimal"], state="readonly")
+combobox.pack(pady=10, padx=10)
+
+# set default value dropdown to "Binary"
+input_type.set("Binary")
+
 def calculate():
     # put input into calculations
-    if entry1.get() and entry2.get():  # If the binary mantissa and base-2 exponent fields are not empty
+    if input_type.get() == "Binary" and entry1.get() and entry2.get():  # If the binary mantissa and base-2 exponent fields are not empty
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
-    elif entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
+    elif input_type.get() == "Decimal" and entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
     # print final result/s
@@ -122,11 +137,43 @@ def calculate():
 def clear():
     entry1.delete(0, "end")
     entry2.delete(0, "end")
+    entry3.delete(0, "end")
+    entry4.delete(0, "end")
 
-label = customtkinter.CTkLabel(master=frame, text="Binary-128 Floating Point Converter", font=("Arial", 20))
-label.pack(pady=10, padx=10)
+# 143 - 173 are what I editted
+binary_frame = customtkinter.CTkFrame(master=frame)
+binary_frame.pack(pady=10, padx=10, fill="both", expand=True)
+decimal_frame = customtkinter.CTkFrame(master=frame)
 
-entry1 = customtkinter.CTkEntry(master=frame, 
+convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
+clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14))
+
+convert_button.pack(pady=10, padx=10)
+clear_button.pack(pady=10, padx=10)
+
+i = 0
+# update displayed input fields based on selected input type
+def update_inputs(event):
+    global i
+    if i > 0:
+        convert_button.pack_forget()
+        clear_button.pack_forget()
+    if input_type.get() == "Binary":
+        decimal_frame.pack_forget()
+        binary_frame.pack(pady=10, padx=10, fill="both", expand=True)
+        convert_button.pack(pady=10, padx=10)
+        clear_button.pack(pady=10, padx=10)
+    else:
+        binary_frame.pack_forget()
+        decimal_frame.pack(pady=10, padx=10, fill="both", expand=True)
+        convert_button.pack(pady=10, padx=10)
+        clear_button.pack(pady=10, padx=10)
+    i += 1
+    print(i)
+    
+combobox.bind("<<ComboboxSelected>>", update_inputs)
+
+entry1 = customtkinter.CTkEntry(master=binary_frame, 
                                 placeholder_text="Binary mantissa", 
                                 font=("Arial", 14),
                                 height=40,
@@ -135,7 +182,7 @@ entry1 = customtkinter.CTkEntry(master=frame,
                                 )
 entry1.pack(pady=10, padx=10)
 
-entry2 = customtkinter.CTkEntry(master=frame, 
+entry2 = customtkinter.CTkEntry(master=binary_frame, 
                                 placeholder_text="Base-2 exponent", 
                                 font=("Arial", 14),
                                 height=40,
@@ -144,7 +191,7 @@ entry2 = customtkinter.CTkEntry(master=frame,
                                 )
 entry2.pack(pady=10, padx=10)
 
-entry3 = customtkinter.CTkEntry(master=frame, 
+entry3 = customtkinter.CTkEntry(master=decimal_frame, 
                                 placeholder_text="Decimal number", 
                                 font=("Arial", 14),
                                 height=40,
@@ -153,7 +200,7 @@ entry3 = customtkinter.CTkEntry(master=frame,
                                 )
 entry3.pack(pady=10, padx=10)
 
-entry4 = customtkinter.CTkEntry(master=frame, 
+entry4 = customtkinter.CTkEntry(master=decimal_frame, 
                                 placeholder_text="Base-10 exponent", 
                                 font=("Arial", 14),
                                 height=40,
@@ -161,12 +208,7 @@ entry4 = customtkinter.CTkEntry(master=frame,
                                 corner_radius = 40
                                 )
 entry4.pack(pady=10, padx=10)
-
-button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
-button.pack(pady=10, padx=10)
-
-button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14))
-button.pack(pady=10, padx=10)
+decimal_frame.pack_forget()
 
 result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
 result0.pack(pady=10, padx=10)
