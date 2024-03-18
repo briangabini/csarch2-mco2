@@ -20,7 +20,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
-root.geometry("1400x450")
+root.geometry("1400x520")
 
 class Binary128Converter:
     def __init__(self):
@@ -129,7 +129,7 @@ def calculate():
     elif input_type.get() == "Decimal" and entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
-    # print final result/s
+    # print final results
     result0.configure(text=f'----- RESULT -----')
     result1.configure(text=f'Binary format: {converter.get_binary128()}')
     result2.configure(text=f'Hexadecimal format: {converter.get_hexadecimal()}')
@@ -140,13 +140,13 @@ def clear():
     entry3.delete(0, "end")
     entry4.delete(0, "end")
 
-# 143 - 173 are what I editted
+# 143 - 173 are what I edited - Carl
 binary_frame = customtkinter.CTkFrame(master=frame)
-binary_frame.pack(pady=10, padx=10, fill="both", expand=True)
+binary_frame.pack(pady=10, padx=10, fill="both")
 decimal_frame = customtkinter.CTkFrame(master=frame)
 
-convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
-clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14))
+convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14)) # calculates the result based on the given input
+clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14)) # clears all text input
 
 convert_button.pack(pady=10, padx=10)
 clear_button.pack(pady=10, padx=10)
@@ -159,18 +159,40 @@ def update_inputs(event):
         convert_button.pack_forget()
         clear_button.pack_forget()
     if input_type.get() == "Binary":
+        # reset frame
         decimal_frame.pack_forget()
-        binary_frame.pack(pady=10, padx=10, fill="both", expand=True)
+        convert_button.pack_forget()
+        clear_button.pack_forget()
+        result0.pack_forget()
+        result1.pack_forget()
+        result2.pack_forget()
+        
+        # append (or pack) new frames
+        binary_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
+        result0.pack(pady=10, padx=10)
+        result1.pack(pady=10, padx=10)
+        result2.pack(pady=10, padx=10)
     else:
+        # reset frame
         binary_frame.pack_forget()
-        decimal_frame.pack(pady=10, padx=10, fill="both", expand=True)
+        convert_button.pack_forget()
+        clear_button.pack_forget()
+        result0.pack_forget()
+        result1.pack_forget()
+        result2.pack_forget()
+        
+        # append (or pack) new frames
+        decimal_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
+        result0.pack(pady=10, padx=10)
+        result1.pack(pady=10, padx=10)
+        result2.pack(pady=10, padx=10)
     i += 1
     print(i)
-    
+
 combobox.bind("<<ComboboxSelected>>", update_inputs)
 
 entry1 = customtkinter.CTkEntry(master=binary_frame, 
@@ -208,7 +230,6 @@ entry4 = customtkinter.CTkEntry(master=decimal_frame,
                                 corner_radius = 40
                                 )
 entry4.pack(pady=10, padx=10)
-decimal_frame.pack_forget()
 
 result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
 result0.pack(pady=10, padx=10)
