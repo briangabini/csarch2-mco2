@@ -74,6 +74,9 @@ class Binary128Converter:
     def convert_binary_mantissa_to_binary128(self, binary_mantissa, base_2_exponent):
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
         
+        if '.' not in binary_mantissa:
+            binary_mantissa += '.'
+
         binary_mantissa, base_2_exponent = self.normalize_binary_floating_point(binary_mantissa, base_2_exponent)   # Normalize the binary mantissa
         print(binary_mantissa, base_2_exponent)
         # If the base-2 exponent is less than -16382, then special case denormalized
@@ -122,9 +125,21 @@ combobox.pack(pady=10, padx=10)
 # set default value dropdown to "Binary"
 input_type.set("Binary")
 
+import re
+
+
+def is_valid_binary(input_string):
+    # The regex pattern for a binary number with or without a decimal point
+    pattern = r'^[01]+(\.[01]+)?$'
+    return bool(re.match(pattern, input_string))
+
 def calculate():
+    
     # put input into calculations
     if input_type.get() == "Binary" and entry1.get() and entry2.get():  # If the binary mantissa and base-2 exponent fields are not empty
+        if not is_valid_binary(entry1.get()):
+            print("Invalid binary input. Please enter a binary number (with or without a decimal point).")
+            return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
     elif input_type.get() == "Decimal" and entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
