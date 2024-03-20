@@ -133,15 +133,24 @@ def is_valid_binary(input_string):
     pattern = r'^[01]+(\.[01]+)?$'
     return bool(re.match(pattern, input_string))
 
+error_message = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
+error_message.pack(pady=10, padx=10)
+
 def calculate():
-    
+    error_message.configure(text="")
     # put input into calculations
-    if input_type.get() == "Binary" and entry1.get() and entry2.get():  # If the binary mantissa and base-2 exponent fields are not empty
-        if not is_valid_binary(entry1.get()):
-            print("Invalid binary input. Please enter a binary number (with or without a decimal point).")
+    if input_type.get() == "Binary":  # If the binary mantissa and base-2 exponent fields are not empty
+        if not entry1.get() or not entry2.get():
+            error_message.configure(text="Please enter a binary mantissa and a base-2 exponent.")
+            return
+        elif not is_valid_binary(entry1.get()):
+            error_message.configure(text="Invalid binary input. Please enter a binary number (with or without a decimal point).")
             return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
-    elif input_type.get() == "Decimal" and entry3.get() and entry4.get():  # If the decimal number and base-10 exponent fields are not empty
+    elif input_type.get() == "Decimal":  # If the decimal number and base-10 exponent fields are not empty
+        if not entry3.get() or not entry4.get():  # If the decimal number or base-10 exponent field is empty
+            error_message.configure(text="Please enter a decimal number and a base-10 exponent.")
+            return
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
     # print final results
@@ -170,6 +179,7 @@ i = 0
 # update displayed input fields based on selected input type
 def update_inputs(event):
     global i
+    error_message.configure(text="")
     if i > 0:
         convert_button.pack_forget()
         clear_button.pack_forget()
