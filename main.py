@@ -90,7 +90,7 @@ class Binary128Converter:
         if binary_mantissa == 'sNaN':
             self.sign_bit = '0'
             self.exponent_bits = '1' * 15
-            self.mantissa_bits = '01' + 'x' * 111
+            self.mantissa_bits = '01' + 'x' * 110
             return
         elif binary_mantissa == 'qNaN':
             self.sign_bit = '0'
