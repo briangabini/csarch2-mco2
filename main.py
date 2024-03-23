@@ -31,12 +31,10 @@ class Binary128Converter:
     def convert_decimal_to_binary128(self, decimal_number, base_2_exponent):
         # Split the decimal number into integer and fractional parts
         integer_part = int(decimal_number)                      
-        fractional_part = decimal_number - integer_part
-
+        fractional_part = abs(decimal_number) - abs(integer_part)
         binary_integer_part = format(integer_part, 'b')                                                             # Convert the integer part to binary        
         binary_fractional_part = self.convert_fraction_to_binary(fractional_part)                                   # Convert the fractional part to binary
         binary_number = binary_integer_part + '.' + binary_fractional_part                                          # Combine the binary integer and fractional parts                 
-
         self.convert_binary_mantissa_to_binary128(binary_number, base_2_exponent)                                   # Convert the binary mantissa to binary128
 
     def convert_fraction_to_binary(self, fraction):
@@ -52,6 +50,10 @@ class Binary128Converter:
             # If the integer part of the fraction is 0, add '0' to the binary fraction
             else:
                 binary_fraction += '0'
+            
+            if len(binary_fraction) >= 112:                                                                         # If the binary fraction is greater than 100 bits
+                break                                                                                               # Break the loop
+            
         return binary_fraction
     
     def normalize_binary_floating_point(self,  binary_mantissa, base_2_exponent):
@@ -72,6 +74,15 @@ class Binary128Converter:
         return normalized_mantissa, base_2_exponent
 
     def convert_binary_mantissa_to_binary128(self, binary_mantissa, base_2_exponent):
+        # if (is_sNaN(entry1.get()) and is_sNaN(entry2.get())) or (is_sNaN(entry3.get()) and is_sNaN(entry4.get())):
+        #     self.sign_bit = 'x'
+        #     self.exponent_bits = '1' * 15
+        #     self.mantissa_bits = '01' + 'x' * 110
+        # elif (is_qNaN(entry1.get()) and is_qNaN(entry2.get())) or (is_qNaN(entry3.get()) and is_qNaN(entry4.get())):
+        #     self.sign_bit = 'x'
+        #     self.exponent_bits = '1' * 15
+        #     self.mantissa_bits = '1' + 'x' * 111
+
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
         
         if '.' not in binary_mantissa:
@@ -130,17 +141,27 @@ import re
 
 def is_valid_binary(input_string):
     # The regex pattern for a binary number with or without a decimal point
-    pattern = r'^-?[01]+(\.[01]+)?$'
+    pattern = r'^-?[01]+(\.[01]+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_decimal(input_string):
     # The regex pattern for a decimal number
-    pattern = r'^-?\d+(\.\d+)?$'
+    pattern = r'^-?\d+(\.\d+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_exponent(input_string):
     # The regex pattern for a base-2 exponent
-    pattern = r'^-?\d+$'
+    pattern = r'^-?\d+$|^sNaN$|^qNaN$'
+    return bool(re.match(pattern, input_string))
+
+def is_sNaN(input_string):
+    # The regex pattern for a base-2 exponent
+    pattern = r'^sNaN$'
+    return bool(re.match(pattern, input_string))
+
+def is_qNaN(input_string):
+    # The regex pattern for a base-2 exponent
+    pattern = r'^qNaN$'
     return bool(re.match(pattern, input_string))
 
 error_message = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
