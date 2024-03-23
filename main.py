@@ -20,7 +20,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
-root.geometry("1525x790")
+root.geometry("1525x850")
 
 class Binary128Converter:
     def __init__(self):
@@ -205,36 +205,36 @@ def calculate():
     # put input into calculations
     if input_type.get() == "Binary":  # If the binary mantissa and base-2 exponent fields are not empty
         if not entry1.get() or not entry2.get():
-            error_message.configure(text="Please enter a binary mantissa and a base-2 exponent.")
+            error_message.configure(text_color="red", text="Please enter a binary mantissa and a base-2 exponent.")
             return
         elif not is_valid_binary(entry1.get()):
-            error_message.configure(text="Invalid binary input. Please enter a binary number (with or without a decimal point).")
+            error_message.configure(text_color="red", text="Invalid binary input. Please enter a binary number (with or without a decimal point).")
             return
         elif not is_valid_exponent(entry2.get()):
-            error_message.configure(text="Invalid base 2 exponent input. Please enter a whole number exponent, either positive or negative.")
+            error_message.configure(text_color="red", text="Invalid base 2 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
         elif is_sNaN(entry1.get()) and not is_sNaN(entry2.get()) or is_sNaN(entry2.get()) and not is_sNaN(entry1.get()):
-            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            error_message.configure(text_color="red", text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         elif is_qNaN(entry1.get()) and not is_qNaN(entry2.get()) or is_qNaN(entry2.get()) and not is_qNaN(entry1.get()):
-            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            error_message.configure(text_color="red", text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
     elif input_type.get() == "Decimal":  # If the decimal number and base-10 exponent fields are not empty
         if not entry3.get() or not entry4.get():  # If the decimal number or base-10 exponent field is empty
-            error_message.configure(text="Please enter a decimal number and a base-10 exponent.")
+            error_message.configure(text_color="red", text="Please enter a decimal number and a base-10 exponent.")
             return
         elif not is_valid_decimal(entry3.get()):
-            error_message.configure(text="Invalid decimal input. Please enter a number (with or without a decimal point).")
+            error_message.configure(text_color="red", text="Invalid decimal input. Please enter a number (with or without a decimal point).")
             return
         elif not is_valid_exponent(entry4.get()):
-            error_message.configure(text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
+            error_message.configure(text_color="red", text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
         elif is_sNaN(entry3.get()) and not is_sNaN(entry4.get()) or is_sNaN(entry4.get()) and not is_sNaN(entry3.get()):
-            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            error_message.configure(text_color="red", text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         elif is_qNaN(entry3.get()) and not is_qNaN(entry4.get()) or is_qNaN(entry4.get()) and not is_qNaN(entry3.get()):
-            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            error_message.configure(text_color="red", text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         converter.convert_decimal_to_binary128(entry3.get(), entry4.get())
     
