@@ -20,7 +20,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
-root.geometry("1400x600")
+root.geometry("1525x790")
 
 class Binary128Converter:
     def __init__(self):
@@ -29,14 +29,26 @@ class Binary128Converter:
         self.mantissa_bits = '0' * 112                                                                              # 112 bits | binary mantissa
 
     def convert_decimal_to_binary128(self, decimal_number, base_2_exponent):
+        # Check if the decimal number is sNaN or qNaN
+        if decimal_number == 'sNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '01' + 'x' * 111
+            return
+        elif decimal_number == 'qNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '1' + 'x' * 111
+            return
+
+        decimal_number = float(decimal_number)             
+        base_2_exponent = int(base_2_exponent)                                                          # Convert the decimal number to a float
         # Split the decimal number into integer and fractional parts
         integer_part = int(decimal_number)                      
-        fractional_part = decimal_number - integer_part
-
+        fractional_part = abs(decimal_number) - abs(integer_part)
         binary_integer_part = format(integer_part, 'b')                                                             # Convert the integer part to binary        
         binary_fractional_part = self.convert_fraction_to_binary(fractional_part)                                   # Convert the fractional part to binary
         binary_number = binary_integer_part + '.' + binary_fractional_part                                          # Combine the binary integer and fractional parts                 
-
         self.convert_binary_mantissa_to_binary128(binary_number, base_2_exponent)                                   # Convert the binary mantissa to binary128
 
     def convert_fraction_to_binary(self, fraction):
@@ -52,10 +64,13 @@ class Binary128Converter:
             # If the integer part of the fraction is 0, add '0' to the binary fraction
             else:
                 binary_fraction += '0'
+            
+            if len(binary_fraction) >= 112:                                                                         # If the binary fraction is greater than 100 bits
+                break                                                                                               # Break the loop
+            
         return binary_fraction
     
     def normalize_binary_floating_point(self,  binary_mantissa, base_2_exponent):
-        
         binary_mantissa = binary_mantissa.replace('-', '')                                                          # Remove the negative sign if any
         original_point_position = binary_mantissa.index('.')                                                        # Find the position of the binary point
         binary_mantissa = binary_mantissa.replace('.', '')                                                          # Remove the binary point
@@ -72,6 +87,17 @@ class Binary128Converter:
         return normalized_mantissa, base_2_exponent
 
     def convert_binary_mantissa_to_binary128(self, binary_mantissa, base_2_exponent):
+        if binary_mantissa == 'sNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '01' + 'x' * 111
+            return
+        elif binary_mantissa == 'qNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '1' + 'x' * 111
+            return
+
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
         
         if '.' not in binary_mantissa:
@@ -103,10 +129,6 @@ class Binary128Converter:
         hex_value = hex(int(binary128, 2)).upper()                                                                  # Convert binary to hexadecimal
         
         return hex_value
-    
-# Test with binary mantissa
-# binary_mantissa = input("Enter the binary mantissa: ")
-# base_2_exponent = int(input("Enter the base-2 exponent: "))
 
 converter = Binary128Converter()
     
@@ -130,17 +152,27 @@ import re
 
 def is_valid_binary(input_string):
     # The regex pattern for a binary number with or without a decimal point
-    pattern = r'^-?[01]+(\.[01]+)?$'
+    pattern = r'^-?[01]+(\.[01]+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_decimal(input_string):
     # The regex pattern for a decimal number
-    pattern = r'^-?\d+(\.\d+)?$'
+    pattern = r'^-?\d+(\.\d+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_exponent(input_string):
     # The regex pattern for a base-2 exponent
-    pattern = r'^-?\d+$'
+    pattern = r'^-?\d+$|^sNaN$|^qNaN$'
+    return bool(re.match(pattern, input_string))
+
+def is_sNaN(input_string):
+    # The regex pattern for a base-2 exponent
+    pattern = r'^sNaN$'
+    return bool(re.match(pattern, input_string))
+
+def is_qNaN(input_string):
+    # The regex pattern for a base-2 exponent
+    pattern = r'^qNaN$'
     return bool(re.match(pattern, input_string))
 
 error_message = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
@@ -170,12 +202,15 @@ def calculate():
         elif not is_valid_exponent(entry4.get()):
             error_message.configure(text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
-        converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
+        converter.convert_decimal_to_binary128(entry3.get(), entry4.get())
     
     # print final results
-    result0.configure(text=f'----- RESULT -----')
-    result1.configure(text=f'Binary format: {converter.get_binary128()}')
-    result2.configure(text=f'Hexadecimal format: {converter.get_hexadecimal()}')
+    result1.configure(text=f'BINARY RESULT = {converter.get_binary128()}')
+    result11.configure(text=f'Sign bit: {converter.sign_bit}')
+    result12.configure(text=f'Exponent: {converter.exponent_bits}')
+    result13.configure(text=f'Mantissa: {converter.mantissa_bits}')
+    resultdiv.configure(text=f'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
+    result2.configure(text=f'HEXADECIMAL RESULT = {converter.get_hexadecimal()}')
     save_button.pack(pady=10, padx=10)
 
 def clear():
@@ -189,19 +224,25 @@ binary_frame = customtkinter.CTkFrame(master=frame)
 binary_frame.pack(pady=10, padx=10, fill="both")
 decimal_frame = customtkinter.CTkFrame(master=frame)
 
+result_frame = customtkinter.CTkFrame(master=frame)
+
 convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14)) # calculates the result based on the given input
 clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14)) # clears all text input
 
 convert_button.pack(pady=10, padx=10)
 clear_button.pack(pady=10, padx=10)
+result_frame.pack(pady=10, padx=10, fill="both")
 
 i = 0
 # update displayed input fields based on selected input type
 def update_inputs(event):
     global i
     error_message.configure(text="")
-    result0.configure(text="")
     result1.configure(text="")
+    result11.configure(text="")
+    result12.configure(text="")
+    result13.configure(text="")
+    resultdiv.configure(text="")
     result2.configure(text="")
     save_button.pack_forget()
     
@@ -213,34 +254,27 @@ def update_inputs(event):
         decimal_frame.pack_forget()
         convert_button.pack_forget()
         clear_button.pack_forget()
-        result0.pack_forget()
-        result1.pack_forget()
-        result2.pack_forget()
+        result_frame.pack_forget()
         
         # append (or pack) new frames
         binary_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
-        result0.pack(pady=10, padx=10)
-        result1.pack(pady=10, padx=10)
-        result2.pack(pady=10, padx=10)
+        result_frame.pack(pady=10, padx=10, fill="both")
+        
         
     else:
         # reset frame
         binary_frame.pack_forget()
         convert_button.pack_forget()
         clear_button.pack_forget()
-        result0.pack_forget()
-        result1.pack_forget()
-        result2.pack_forget()
+        result_frame.pack_forget()
         
         # append (or pack) new frames
         decimal_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
-        result0.pack(pady=10, padx=10)
-        result1.pack(pady=10, padx=10)
-        result2.pack(pady=10, padx=10)
+        result_frame.pack(pady=10, padx=10, fill="both")
         
     i += 1
     print(i)
@@ -253,10 +287,17 @@ def save_to_file():
     if file_path:
         # Write the result to the file
         with open(file_path, "w") as file:
-            file.write(f'Binary format: {converter.get_binary128()}\n')
-            file.write(f'Hexadecimal format: {converter.get_hexadecimal()}\n')
+            file.write(f'BINARY RESULT = {converter.get_binary128()}\n')
+            file.write(f'Sign bit: {converter.sign_bit}\n')
+            file.write(f'Exponent: {converter.exponent_bits}\n')
+            file.write(f'Mantissa: {converter.mantissa_bits}\n')
+            file.write(f'--------------------------------------------------------------------------------------------------------------------------\n')
+            file.write(f'HEXADECIMAL RESULT = {converter.get_hexadecimal()}\n')
             
 combobox.bind("<<ComboboxSelected>>", update_inputs)
+
+entryBinaryIntro = customtkinter.CTkLabel(master=binary_frame, text="Please input your binary values:", font=("Arial", 14))
+entryBinaryIntro.pack(pady=10, padx=10)
 
 entry1 = customtkinter.CTkEntry(master=binary_frame, 
                                 placeholder_text="Binary mantissa", 
@@ -276,6 +317,9 @@ entry2 = customtkinter.CTkEntry(master=binary_frame,
                                 )
 entry2.pack(pady=10, padx=10)
 
+entryDecimalIntro = customtkinter.CTkLabel(master=decimal_frame, text="Please input your decimal values:", font=("Arial", 14))
+entryDecimalIntro.pack(pady=10, padx=10)
+
 entry3 = customtkinter.CTkEntry(master=decimal_frame, 
                                 placeholder_text="Decimal number", 
                                 font=("Arial", 14),
@@ -294,20 +338,31 @@ entry4 = customtkinter.CTkEntry(master=decimal_frame,
                                 )
 entry4.pack(pady=10, padx=10)
 
-# result0 is for literally the string "----- RESULT -----"
-result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
-result0.pack(pady=10, padx=10)
-
 # result1 is for the binary format of the result
-result1 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-result1.pack(pady=10, padx=10)
+result1 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+result1.pack(anchor="w", pady=14, padx=10)
+
+# result11 is for the SIGN BIT of the binary format of the result
+result11 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result11.pack(anchor="w", pady=3, padx=10)
+
+# result12 is for the EXPONENT of the binary format of the result
+result12 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result12.pack(anchor="w", pady=3, padx=10)
+
+# result13 is for the MANTISSA of the binary format of the result
+result13 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result13.pack(anchor="w", pady=3, padx=10)
+
+# resultdiv is for separating the binary and hexadecimal results
+resultdiv = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+resultdiv.pack(anchor="w", pady=10, padx=10)
 
 # result2 is for the hexadecimal format of the result
-result2 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-result2.pack(pady=10, padx=10)
+result2 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+result2.pack(anchor="w", pady=14, padx=10)
 
 # save_button is for saving the results to a text file; Should only show up when the result is calculated
 save_button = customtkinter.CTkButton(master=frame, text="Save to File", command=save_to_file, font=("Arial", 14))
-#save_button.pack(pady=10, padx=10)
 
 root.mainloop()
