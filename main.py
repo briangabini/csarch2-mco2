@@ -308,8 +308,9 @@ def save_to_file():
             
 combobox.bind("<<ComboboxSelected>>", update_inputs)
 
-entryBinaryIntro = customtkinter.CTkLabel(master=binary_frame, text="Please input your binary values:", font=("Arial", 14))
+entryBinaryIntro = customtkinter.CTkLabel(master=binary_frame, text="Please input your binary values:", font=("Arial", 16))
 entryBinaryIntro.pack(pady=10, padx=10)
+specialInstructionsBinary = customtkinter.CTkLabel(master=binary_frame, text="Note: To replicate the special cases of 'sNaN' and 'qNaN', please input 'sNaN' or 'qNaN' in both fields. (i.e. Binary mantissa: sNaN | Base-2 exponent: sNaN)", font=("Arial", 14))
 
 entry1 = customtkinter.CTkEntry(master=binary_frame, 
                                 placeholder_text="Binary mantissa", 
@@ -329,8 +330,11 @@ entry2 = customtkinter.CTkEntry(master=binary_frame,
                                 )
 entry2.pack(pady=10, padx=10)
 
-entryDecimalIntro = customtkinter.CTkLabel(master=decimal_frame, text="Please input your decimal values:", font=("Arial", 14))
+specialInstructionsBinary.pack(pady=15, padx=10)
+
+entryDecimalIntro = customtkinter.CTkLabel(master=decimal_frame, text="Please input your decimal values:", font=("Arial", 16))
 entryDecimalIntro.pack(pady=10, padx=10)
+specialInstructionsDecimal = customtkinter.CTkLabel(master=decimal_frame, text="Note: To replicate the special cases of 'sNaN' and 'qNaN', please input 'sNaN' or 'qNaN' in both fields. (i.e. Binary mantissa: sNaN | Base-2 exponent: sNaN)", font=("Arial", 14))
 
 entry3 = customtkinter.CTkEntry(master=decimal_frame, 
                                 placeholder_text="Decimal number", 
@@ -349,6 +353,8 @@ entry4 = customtkinter.CTkEntry(master=decimal_frame,
                                 corner_radius = 40
                                 )
 entry4.pack(pady=10, padx=10)
+
+specialInstructionsDecimal.pack(pady=15, padx=10)
 
 # result1 is for the binary format of the result
 result1 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
