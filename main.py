@@ -82,11 +82,11 @@ class Binary128Converter:
         # If the base-2 exponent is less than -16382, then special case denormalized
         if base_2_exponent < -16382:                                                                                # If the base-2 exponent is less than -16382, the number is denormalized
             self.exponent_bits = '0' * 15                                                                           # The exponent bits are all zeros for denormalized numbers
-            shift = min(112, -base_2_exponent - 16382) 
-            shift = abs(shift)
+            shift = min(112, -base_2_exponent - 16382)
+            shift = abs(shift - 1)
             self.mantissa_bits = binary_mantissa.replace('.', '')
             self.mantissa_bits = '0' * shift + self.mantissa_bits
-            self.mantissa_bits = self.mantissa_bits.ljust(112, '0')
+            self.mantissa_bits = self.mantissa_bits.ljust(112, '0')[:112]
         # If the base-2 exponent is greater than 16383, then special case infinity
         elif base_2_exponent > 16383:
             self.exponent_bits = '1' * 15                                                                           # The exponent bits are all ones for infinity
@@ -130,7 +130,17 @@ import re
 
 def is_valid_binary(input_string):
     # The regex pattern for a binary number with or without a decimal point
-    pattern = r'^[01]+(\.[01]+)?$'
+    pattern = r'^-?[01]+(\.[01]+)?$'
+    return bool(re.match(pattern, input_string))
+
+def is_valid_decimal(input_string):
+    # The regex pattern for a decimal number
+    pattern = r'^-?\d+(\.\d+)?$'
+    return bool(re.match(pattern, input_string))
+
+def is_valid_exponent(input_string):
+    # The regex pattern for a base-2 exponent
+    pattern = r'^-?\d+$'
     return bool(re.match(pattern, input_string))
 
 error_message = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
@@ -146,10 +156,19 @@ def calculate():
         elif not is_valid_binary(entry1.get()):
             error_message.configure(text="Invalid binary input. Please enter a binary number (with or without a decimal point).")
             return
+        elif not is_valid_exponent(entry2.get()):
+            error_message.configure(text="Invalid base 2 exponent input. Please enter a whole number exponent, either positive or negative.")
+            return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
     elif input_type.get() == "Decimal":  # If the decimal number and base-10 exponent fields are not empty
         if not entry3.get() or not entry4.get():  # If the decimal number or base-10 exponent field is empty
             error_message.configure(text="Please enter a decimal number and a base-10 exponent.")
+            return
+        elif not is_valid_decimal(entry3.get()):
+            error_message.configure(text="Invalid decimal input. Please enter a number (with or without a decimal point).")
+            return
+        elif not is_valid_exponent(entry4.get()):
+            error_message.configure(text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
