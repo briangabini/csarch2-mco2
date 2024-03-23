@@ -111,6 +111,24 @@ class TestBinary128Converter(unittest.TestCase):
         self.assertEqual(mantisa, '0110011110011101000110111101011000101001001111110001000001100010011011110001010001100111100010000001011101010001')
         self.assertEqual(len(mantisa), 112)
 
+    def test_sNaN_binary_mantissa_to_binary_128(self):
+        self.converter.convert_binary_mantissa_to_binary128('sNaN', 10)
+        sign_and_exp = self.converter.get_binary128()[:17]
+        mantisa = self.converter.get_binary128()[18:]
+        self.assertEqual(sign_and_exp,
+                         'x 111111111111111')
+        self.assertEqual(mantisa, '01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+        self.assertEqual(len(mantisa), 112)
+
+    def test_qNaN_binary_mantissa_to_binary_128(self):
+        self.converter.convert_binary_mantissa_to_binary128('qNaN', 10)
+        sign_and_exp = self.converter.get_binary128()[:17]
+        mantisa = self.converter.get_binary128()[18:]
+        self.assertEqual(sign_and_exp,
+                         'x 111111111111111')
+        self.assertEqual(mantisa, '1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+        self.assertEqual(len(mantisa), 112)
+
     def test_normalize_binary_floating_point_that_needs_left_shift(self):
         normalized_mantissa, base_2_exponent = self.converter.normalize_binary_floating_point('101.01', 25)
         self.assertEqual(normalized_mantissa, '1.0101')
