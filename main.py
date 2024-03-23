@@ -31,12 +31,12 @@ class Binary128Converter:
     def convert_decimal_to_binary128(self, decimal_number, base_2_exponent):
         # Check if the decimal number is sNaN or qNaN
         if decimal_number == 'sNaN':
-            self.sign_bit = '0'
+            self.sign_bit = 'x'
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '01' + 'x' * 110
             return
         elif decimal_number == 'qNaN':
-            self.sign_bit = '0'
+            self.sign_bit = 'x'
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '1' + 'x' * 111
             return
@@ -88,12 +88,12 @@ class Binary128Converter:
 
     def convert_binary_mantissa_to_binary128(self, binary_mantissa, base_2_exponent):
         if binary_mantissa == 'sNaN':
-            self.sign_bit = '0'
+            self.sign_bit = 'x'
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '01' + 'x' * 110
             return
         elif binary_mantissa == 'qNaN':
-            self.sign_bit = '0'
+            self.sign_bit = 'x'
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '1' + 'x' * 111
             return
