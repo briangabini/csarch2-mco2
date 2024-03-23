@@ -29,6 +29,20 @@ class Binary128Converter:
         self.mantissa_bits = '0' * 112                                                                              # 112 bits | binary mantissa
 
     def convert_decimal_to_binary128(self, decimal_number, base_2_exponent):
+        # Check if the decimal number is sNaN or qNaN
+        if decimal_number == 'sNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '01' + 'x' * 111
+            return
+        elif decimal_number == 'qNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '1' + 'x' * 111
+            return
+
+        decimal_number = float(decimal_number)             
+        base_2_exponent = int(base_2_exponent)                                                          # Convert the decimal number to a float
         # Split the decimal number into integer and fractional parts
         integer_part = int(decimal_number)                      
         fractional_part = abs(decimal_number) - abs(integer_part)
@@ -57,7 +71,6 @@ class Binary128Converter:
         return binary_fraction
     
     def normalize_binary_floating_point(self,  binary_mantissa, base_2_exponent):
-        
         binary_mantissa = binary_mantissa.replace('-', '')                                                          # Remove the negative sign if any
         original_point_position = binary_mantissa.index('.')                                                        # Find the position of the binary point
         binary_mantissa = binary_mantissa.replace('.', '')                                                          # Remove the binary point
@@ -74,14 +87,16 @@ class Binary128Converter:
         return normalized_mantissa, base_2_exponent
 
     def convert_binary_mantissa_to_binary128(self, binary_mantissa, base_2_exponent):
-        # if (is_sNaN(entry1.get()) and is_sNaN(entry2.get())) or (is_sNaN(entry3.get()) and is_sNaN(entry4.get())):
-        #     self.sign_bit = 'x'
-        #     self.exponent_bits = '1' * 15
-        #     self.mantissa_bits = '01' + 'x' * 110
-        # elif (is_qNaN(entry1.get()) and is_qNaN(entry2.get())) or (is_qNaN(entry3.get()) and is_qNaN(entry4.get())):
-        #     self.sign_bit = 'x'
-        #     self.exponent_bits = '1' * 15
-        #     self.mantissa_bits = '1' + 'x' * 111
+        if binary_mantissa == 'sNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '01' + 'x' * 111
+            return
+        elif binary_mantissa == 'qNaN':
+            self.sign_bit = '0'
+            self.exponent_bits = '1' * 15
+            self.mantissa_bits = '1' + 'x' * 111
+            return
 
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
         
@@ -114,10 +129,6 @@ class Binary128Converter:
         hex_value = hex(int(binary128, 2)).upper()                                                                  # Convert binary to hexadecimal
         
         return hex_value
-    
-# Test with binary mantissa
-# binary_mantissa = input("Enter the binary mantissa: ")
-# base_2_exponent = int(input("Enter the base-2 exponent: "))
 
 converter = Binary128Converter()
     
@@ -191,7 +202,7 @@ def calculate():
         elif not is_valid_exponent(entry4.get()):
             error_message.configure(text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
-        converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
+        converter.convert_decimal_to_binary128(entry3.get(), entry4.get())
     
     # print final results
     result1.configure(text=f'BINARY RESULT = {converter.get_binary128()}')
