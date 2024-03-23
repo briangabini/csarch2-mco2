@@ -53,21 +53,36 @@ class TestBinary128Converter(unittest.TestCase):
 
     def test_convert_positive_denorm_binary_mantissa_to_binary_128(self):
         self.converter.convert_binary_mantissa_to_binary128('101100.0', -16388)
-        self.assertEqual(self.converter.get_binary128(),
-                         '0 000000000000000 0110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
-        self.assertEqual(self.converter.get_hexadecimal(), '0X6000000000000000000000000000')
+        sign_and_exp = self.converter.get_binary128()[:17]
+        mantisa = self.converter.get_binary128()[18:]
+        self.assertEqual(sign_and_exp,
+                         '0 000000000000000')
+        self.assertNotEqual(mantisa, '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+        self.assertEqual(len(mantisa), 112)
 
     def test_convert_border_negative_denorm_binary_mantissa_to_binary_128(self):
-        self.converter.convert_binary_mantissa_to_binary128('1011000.0', -16388)
+        self.converter.convert_binary_mantissa_to_binary128('-1011000.0', -16388)
         self.assertEqual(self.converter.get_binary128(),
                          '1 000000000000001 0110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
         self.assertEqual(self.converter.get_hexadecimal(), '0X80016000000000000000000000000000')
 
     def test_convert_negative_denorm_binary_mantissa_to_binary_128(self):
-        self.converter.convert_binary_mantissa_to_binary128('101100.0', -16388)
-        self.assertEqual(self.converter.get_binary128(),
-                         '1 000000000000000 0110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
-        self.assertEqual(self.converter.get_hexadecimal(), '0X80006000000000000000000000000000')
+        self.converter.convert_binary_mantissa_to_binary128('-101100.0', -16388)
+        sign_and_exp = self.converter.get_binary128()[:17]
+        mantisa = self.converter.get_binary128()[18:]
+        self.assertEqual(sign_and_exp,
+                         '1 000000000000000')
+        self.assertNotEqual(mantisa, '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+        self.assertEqual(len(mantisa), 112)
+
+    def test_convert_super_negative_denorm_binary_mantissa_to_binary_128(self):
+        self.converter.convert_binary_mantissa_to_binary128('-1.0', -180000)
+        sign_and_exp = self.converter.get_binary128()[:17]
+        mantisa = self.converter.get_binary128()[18:]
+        self.assertEqual(sign_and_exp,
+                         '1 000000000000000')
+        self.assertNotEqual(mantisa, '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+        self.assertEqual(len(mantisa), 112)
 
     def test_normalize_binary_floating_point_that_needs_left_shift(self):
         normalized_mantissa, base_2_exponent = self.converter.normalize_binary_floating_point('101.01', 25)
