@@ -20,7 +20,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
-root.geometry("1400x600")
+root.geometry("1525x790")
 
 class Binary128Converter:
     def __init__(self):
@@ -173,9 +173,12 @@ def calculate():
         converter.convert_decimal_to_binary128(float(entry3.get()), int(entry4.get()))
     
     # print final results
-    result0.configure(text=f'----- RESULT -----')
-    result1.configure(text=f'Binary format: {converter.get_binary128()}')
-    result2.configure(text=f'Hexadecimal format: {converter.get_hexadecimal()}')
+    result1.configure(text=f'BINARY RESULT = {converter.get_binary128()}')
+    result11.configure(text=f'Sign bit: {converter.sign_bit}')
+    result12.configure(text=f'Exponent: {converter.exponent_bits}')
+    result13.configure(text=f'Mantissa: {converter.mantissa_bits}')
+    resultdiv.configure(text=f'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
+    result2.configure(text=f'HEXADECIMAL RESULT = {converter.get_hexadecimal()}')
     save_button.pack(pady=10, padx=10)
 
 def clear():
@@ -189,19 +192,25 @@ binary_frame = customtkinter.CTkFrame(master=frame)
 binary_frame.pack(pady=10, padx=10, fill="both")
 decimal_frame = customtkinter.CTkFrame(master=frame)
 
+result_frame = customtkinter.CTkFrame(master=frame)
+
 convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14)) # calculates the result based on the given input
 clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14)) # clears all text input
 
 convert_button.pack(pady=10, padx=10)
 clear_button.pack(pady=10, padx=10)
+result_frame.pack(pady=10, padx=10, fill="both")
 
 i = 0
 # update displayed input fields based on selected input type
 def update_inputs(event):
     global i
     error_message.configure(text="")
-    result0.configure(text="")
     result1.configure(text="")
+    result11.configure(text="")
+    result12.configure(text="")
+    result13.configure(text="")
+    resultdiv.configure(text="")
     result2.configure(text="")
     save_button.pack_forget()
     
@@ -213,34 +222,27 @@ def update_inputs(event):
         decimal_frame.pack_forget()
         convert_button.pack_forget()
         clear_button.pack_forget()
-        result0.pack_forget()
-        result1.pack_forget()
-        result2.pack_forget()
+        result_frame.pack_forget()
         
         # append (or pack) new frames
         binary_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
-        result0.pack(pady=10, padx=10)
-        result1.pack(pady=10, padx=10)
-        result2.pack(pady=10, padx=10)
+        result_frame.pack(pady=10, padx=10, fill="both")
+        
         
     else:
         # reset frame
         binary_frame.pack_forget()
         convert_button.pack_forget()
         clear_button.pack_forget()
-        result0.pack_forget()
-        result1.pack_forget()
-        result2.pack_forget()
+        result_frame.pack_forget()
         
         # append (or pack) new frames
         decimal_frame.pack(pady=10, padx=10, fill="both")
         convert_button.pack(pady=10, padx=10)
         clear_button.pack(pady=10, padx=10)
-        result0.pack(pady=10, padx=10)
-        result1.pack(pady=10, padx=10)
-        result2.pack(pady=10, padx=10)
+        result_frame.pack(pady=10, padx=10, fill="both")
         
     i += 1
     print(i)
@@ -257,6 +259,9 @@ def save_to_file():
             file.write(f'Hexadecimal format: {converter.get_hexadecimal()}\n')
             
 combobox.bind("<<ComboboxSelected>>", update_inputs)
+
+entryBinaryIntro = customtkinter.CTkLabel(master=binary_frame, text="Please input your binary values:", font=("Arial", 14))
+entryBinaryIntro.pack(pady=10, padx=10)
 
 entry1 = customtkinter.CTkEntry(master=binary_frame, 
                                 placeholder_text="Binary mantissa", 
@@ -276,6 +281,9 @@ entry2 = customtkinter.CTkEntry(master=binary_frame,
                                 )
 entry2.pack(pady=10, padx=10)
 
+entryDecimalIntro = customtkinter.CTkLabel(master=decimal_frame, text="Please input your decimal values:", font=("Arial", 14))
+entryDecimalIntro.pack(pady=10, padx=10)
+
 entry3 = customtkinter.CTkEntry(master=decimal_frame, 
                                 placeholder_text="Decimal number", 
                                 font=("Arial", 14),
@@ -294,20 +302,31 @@ entry4 = customtkinter.CTkEntry(master=decimal_frame,
                                 )
 entry4.pack(pady=10, padx=10)
 
-# result0 is for literally the string "----- RESULT -----"
-result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
-result0.pack(pady=10, padx=10)
-
 # result1 is for the binary format of the result
-result1 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-result1.pack(pady=10, padx=10)
+result1 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+result1.pack(anchor="w", pady=14, padx=10)
+
+# result11 is for the SIGN BIT of the binary format of the result
+result11 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result11.pack(anchor="w", pady=3, padx=10)
+
+# result12 is for the EXPONENT of the binary format of the result
+result12 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result12.pack(anchor="w", pady=3, padx=10)
+
+# result13 is for the MANTISSA of the binary format of the result
+result13 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 16))
+result13.pack(anchor="w", pady=3, padx=10)
+
+# resultdiv is for separating the binary and hexadecimal results
+resultdiv = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+resultdiv.pack(anchor="w", pady=10, padx=10)
 
 # result2 is for the hexadecimal format of the result
-result2 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
-result2.pack(pady=10, padx=10)
+result2 = customtkinter.CTkLabel(master=result_frame, text="", font=("Arial", 18))
+result2.pack(anchor="w", pady=14, padx=10)
 
 # save_button is for saving the results to a text file; Should only show up when the result is calculated
 save_button = customtkinter.CTkButton(master=frame, text="Save to File", command=save_to_file, font=("Arial", 14))
-#save_button.pack(pady=10, padx=10)
 
 root.mainloop()
