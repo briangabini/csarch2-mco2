@@ -276,8 +276,12 @@ def save_to_file():
     if file_path:
         # Write the result to the file
         with open(file_path, "w") as file:
-            file.write(f'Binary format: {converter.get_binary128()}\n')
-            file.write(f'Hexadecimal format: {converter.get_hexadecimal()}\n')
+            file.write(f'BINARY RESULT = {converter.get_binary128()}\n')
+            file.write(f'Sign bit: {converter.sign_bit}\n')
+            file.write(f'Exponent: {converter.exponent_bits}\n')
+            file.write(f'Mantissa: {converter.mantissa_bits}\n')
+            file.write(f'--------------------------------------------------------------------------------------------------------------------------\n')
+            file.write(f'HEXADECIMAL RESULT = {converter.get_hexadecimal()}\n')
             
 combobox.bind("<<ComboboxSelected>>", update_inputs)
 
