@@ -12,7 +12,7 @@ Output/s:
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import filedialog, ttk
 
 import customtkinter
 
@@ -20,7 +20,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("dark-blue")
 
 root = customtkinter.CTk()
-root.geometry("1400x520")
+root.geometry("1400x600")
 
 class Binary128Converter:
     def __init__(self):
@@ -87,7 +87,7 @@ class Binary128Converter:
             self.mantissa_bits = binary_mantissa.replace('.', '')
             self.mantissa_bits = '0' * shift + self.mantissa_bits
             self.mantissa_bits = self.mantissa_bits.ljust(112, '0')
-                # If the base-2 exponent is greater than 16383, then special case infinity
+        # If the base-2 exponent is greater than 16383, then special case infinity
         elif base_2_exponent > 16383:
             self.exponent_bits = '1' * 15                                                                           # The exponent bits are all ones for infinity
             self.mantissa_bits = '0' * 112                                                                           # The mantissa bits are all zeros for infinity
@@ -157,6 +157,7 @@ def calculate():
     result0.configure(text=f'----- RESULT -----')
     result1.configure(text=f'Binary format: {converter.get_binary128()}')
     result2.configure(text=f'Hexadecimal format: {converter.get_hexadecimal()}')
+    save_button.pack(pady=10, padx=10)
 
 def clear():
     entry1.delete(0, "end")
@@ -180,6 +181,11 @@ i = 0
 def update_inputs(event):
     global i
     error_message.configure(text="")
+    result0.configure(text="")
+    result1.configure(text="")
+    result2.configure(text="")
+    save_button.pack_forget()
+    
     if i > 0:
         convert_button.pack_forget()
         clear_button.pack_forget()
@@ -199,6 +205,7 @@ def update_inputs(event):
         result0.pack(pady=10, padx=10)
         result1.pack(pady=10, padx=10)
         result2.pack(pady=10, padx=10)
+        
     else:
         # reset frame
         binary_frame.pack_forget()
@@ -215,9 +222,21 @@ def update_inputs(event):
         result0.pack(pady=10, padx=10)
         result1.pack(pady=10, padx=10)
         result2.pack(pady=10, padx=10)
+        
     i += 1
     print(i)
-
+    
+def save_to_file():
+    # Open a save file dialog
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+    
+    # If a file path is provided
+    if file_path:
+        # Write the result to the file
+        with open(file_path, "w") as file:
+            file.write(f'Binary format: {converter.get_binary128()}\n')
+            file.write(f'Hexadecimal format: {converter.get_hexadecimal()}\n')
+            
 combobox.bind("<<ComboboxSelected>>", update_inputs)
 
 entry1 = customtkinter.CTkEntry(master=binary_frame, 
@@ -256,13 +275,20 @@ entry4 = customtkinter.CTkEntry(master=decimal_frame,
                                 )
 entry4.pack(pady=10, padx=10)
 
+# result0 is for literally the string "----- RESULT -----"
 result0 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 18))
 result0.pack(pady=10, padx=10)
 
+# result1 is for the binary format of the result
 result1 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
 result1.pack(pady=10, padx=10)
 
+# result2 is for the hexadecimal format of the result
 result2 = customtkinter.CTkLabel(master=frame, text="", font=("Arial", 16))
 result2.pack(pady=10, padx=10)
+
+# save_button is for saving the results to a text file; Should only show up when the result is calculated
+save_button = customtkinter.CTkButton(master=frame, text="Save to File", command=save_to_file, font=("Arial", 14))
+#save_button.pack(pady=10, padx=10)
 
 root.mainloop()
