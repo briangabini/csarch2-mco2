@@ -191,6 +191,12 @@ def calculate():
         elif not is_valid_exponent(entry2.get()):
             error_message.configure(text="Invalid base 2 exponent input. Please enter a whole number exponent, either positive or negative.")
             return
+        elif is_sNaN(entry1.get()) and not is_sNaN(entry2.get()) or is_sNaN(entry2.get()) and not is_sNaN(entry1.get()):
+            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            return
+        elif is_qNaN(entry1.get()) and not is_qNaN(entry2.get()) or is_qNaN(entry2.get()) and not is_qNaN(entry1.get()):
+            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
     elif input_type.get() == "Decimal":  # If the decimal number and base-10 exponent fields are not empty
         if not entry3.get() or not entry4.get():  # If the decimal number or base-10 exponent field is empty
@@ -201,6 +207,12 @@ def calculate():
             return
         elif not is_valid_exponent(entry4.get()):
             error_message.configure(text="Invalid base 10 exponent input. Please enter a whole number exponent, either positive or negative.")
+            return
+        elif is_sNaN(entry3.get()) and not is_sNaN(entry4.get()) or is_sNaN(entry4.get()) and not is_sNaN(entry3.get()):
+            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
+            return
+        elif is_qNaN(entry3.get()) and not is_qNaN(entry4.get()) or is_qNaN(entry4.get()) and not is_qNaN(entry3.get()):
+            error_message.configure(text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         converter.convert_decimal_to_binary128(entry3.get(), entry4.get())
     
