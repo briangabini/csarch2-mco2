@@ -40,6 +40,17 @@ class Binary128Converter:
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '1' + 'x' * 111
             return
+        
+        if decimal_number == '0':
+            self.sign_bit = '0'
+            self.exponent_bits = '0' * 15
+            self.mantissa_bits = '0' * 112
+            return
+        elif decimal_number == '-0':
+            self.sign_bit = '1'
+            self.exponent_bits = '0' * 15
+            self.mantissa_bits = '0' * 112
+            return
 
         decimal_number = float(decimal_number)             
         base_2_exponent = int(base_2_exponent)                                                          # Convert the decimal number to a float
@@ -96,6 +107,17 @@ class Binary128Converter:
             self.sign_bit = 'x'
             self.exponent_bits = '1' * 15
             self.mantissa_bits = '1' + 'x' * 111
+            return
+        
+        if binary_mantissa == '0':
+            self.sign_bit = '0'
+            self.exponent_bits = '0' * 15
+            self.mantissa_bits = '0' * 112
+            return
+        elif binary_mantissa == '-0':
+            self.sign_bit = '1'
+            self.exponent_bits = '0' * 15
+            self.mantissa_bits = '0' * 112
             return
 
         self.sign_bit = '0' if binary_mantissa[0] != '-' else '1'                                                   # Calculate the sign bit
