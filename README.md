@@ -1,8 +1,7 @@
-# csarch2-mco2
+# csarch2-mco2 - Binary-128 Floating Point Converter
 
 INSTRUCTIONS:
-
-- Download .exe file and run file
+- Download 'main.exe' file and run the file
 - Choose between 'binary' and 'decimal' input
 - Type in your inputs into the input boxes
 - Click the 'Confirm' button to calculate the Binary-128 Floating Point output value of your given inputs
@@ -11,4 +10,4 @@ INSTRUCTIONS:
 
 *Note: The .exe was built without a defined author, therefore it might be flagged as a virus, but rest assured that it is completely safe.  build being tagged as having an unknown author.
 
-Link to Demo: https://drive.google.com/file/d/1R2_k_IzuKn40hZTgDCF_eF7SqMRU19l5/preview
+Link to video demo of application: https://drive.google.com/file/d/1R2_k_IzuKn40hZTgDCF_eF7SqMRU19l5/preview
