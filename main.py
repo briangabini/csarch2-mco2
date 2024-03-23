@@ -173,27 +173,22 @@ import re
 
 
 def is_valid_binary(input_string):
-    # The regex pattern for a binary number with or without a decimal point
     pattern = r'^-?[01]+(\.[01]+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_decimal(input_string):
-    # The regex pattern for a decimal number
     pattern = r'^-?\d+(\.\d+)?$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_valid_exponent(input_string):
-    # The regex pattern for a base-2 exponent
     pattern = r'^-?\d+$|^sNaN$|^qNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_sNaN(input_string):
-    # The regex pattern for a base-2 exponent
     pattern = r'^sNaN$'
     return bool(re.match(pattern, input_string))
 
 def is_qNaN(input_string):
-    # The regex pattern for a base-2 exponent
     pattern = r'^qNaN$'
     return bool(re.match(pattern, input_string))
 
@@ -203,7 +198,7 @@ error_message.pack(pady=10, padx=10)
 def calculate():
     error_message.configure(text="")
     # put input into calculations
-    if input_type.get() == "Binary":  # If the binary mantissa and base-2 exponent fields are not empty
+    if input_type.get() == "Binary":
         if not entry1.get() or not entry2.get():
             error_message.configure(text_color="red", text="Please enter a binary mantissa and a base-2 exponent.")
             return
@@ -220,8 +215,8 @@ def calculate():
             error_message.configure(text_color="red", text="If you're trying to input a NaN, please input 'sNaN' or 'qNaN' in both fields.")
             return
         converter.convert_binary_mantissa_to_binary128(entry1.get(), entry2.get())
-    elif input_type.get() == "Decimal":  # If the decimal number and base-10 exponent fields are not empty
-        if not entry3.get() or not entry4.get():  # If the decimal number or base-10 exponent field is empty
+    elif input_type.get() == "Decimal":
+        if not entry3.get() or not entry4.get():
             error_message.configure(text_color="red", text="Please enter a decimal number and a base-10 exponent.")
             return
         elif not is_valid_decimal(entry3.get()):
@@ -253,15 +248,14 @@ def clear():
     entry3.delete(0, "end")
     entry4.delete(0, "end")
 
-# 143 - 173 are what I edited - Carl
 binary_frame = customtkinter.CTkFrame(master=frame)
 binary_frame.pack(pady=10, padx=10, fill="both")
 decimal_frame = customtkinter.CTkFrame(master=frame)
 
 result_frame = customtkinter.CTkFrame(master=frame)
 
-convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14)) # calculates the result based on the given input
-clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14)) # clears all text input
+convert_button = customtkinter.CTkButton(master=frame, text="Convert", command=calculate, font=("Arial", 14))
+clear_button = customtkinter.CTkButton(master=frame, text="Clear", command=clear, font=("Arial", 14))
 
 convert_button.pack(pady=10, padx=10)
 clear_button.pack(pady=10, padx=10)
@@ -314,12 +308,8 @@ def update_inputs(event):
     print(i)
     
 def save_to_file():
-    # Open a save file dialog
     file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
-    
-    # If a file path is provided
     if file_path:
-        # Write the result to the file
         with open(file_path, "w") as file:
             file.write(f'BINARY RESULT = {converter.get_binary128()}\n')
             file.write(f'Sign bit: {converter.sign_bit}\n')
